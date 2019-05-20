@@ -1,0 +1,5 @@
+/tmp
+/.vagrant
+/config.json
+/after.sh
+/*.box

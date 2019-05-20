@@ -1,0 +1,15 @@
+{
+    "name": "lis/centos",
+    "versions":
+    [
+        {
+            "version": "0.0.1",
+            "providers": [
+                {
+                  "name": "virtualbox",
+                  "url": "centos.box"
+                }
+            ]
+        }
+    ]
+}
