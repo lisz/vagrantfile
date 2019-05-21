@@ -39,7 +39,7 @@ fi
 
 block="server {
     listen ${3:-80};
-    server_name .$1;
+    server_name $1;
     root \"$2\";
 
     index index.php index.html index.htm;
