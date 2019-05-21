@@ -7,7 +7,7 @@
             "providers": [
                 {
                   "name": "virtualbox",
-                  "url": "centos.box"
+                  "url": "lis-centos.box"
                 }
             ]
         }

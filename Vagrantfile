@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
         abort "config settings file not found in #{confDir}"
     end
 
-  Config.set(config, settings)
+    Config.set(config, settings)
 
 
   # Disable automatic box update checking. If you disable this, then

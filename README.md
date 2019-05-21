@@ -8,11 +8,10 @@
 
 #### 安装开发环境
 
-- 下载并解压最新版本脚本 [https://github.com/lisxp/vagrantfile](https://github.com/lisxp/vagrantfile/releases)
+- 下载并解压(不能是中文目录)最新版本脚本 [https://github.com/lisxp/vagrantfile](https://github.com/lisxp/vagrantfile/releases)
 - 进入目录 `vagrantfile` 右键打开 `Git Bash`
 - `cp config.json.example config.json`
 - 编辑`config.json`
-    - `authorize` 登录认证`key` 可忽略直接删除
     - `keys` git 仓库的`ssh`秘钥，用`http https`连接可忽略直接删除
     - `folders` 共享文件夹，本机映射到虚拟机
     - `sites` 配置域名

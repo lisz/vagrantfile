@@ -10,7 +10,10 @@ class Config
         script_dir = File.dirname(__FILE__)
 
         # 运行ssh代理转发
+        config.ssh.insert_key = false
         config.ssh.forward_agent = true
+        config.ssh.username = settings['username'] ||= 'vagrant'
+        config.ssh.password = settings['password'] ||= 'vagrant'
 
         # 设置虚拟机配置 name 是和虚拟机的关联属性
         config.vm.define settings['name'] ||= 'lis-centos'
@@ -78,14 +81,14 @@ class Config
         end
 
         # Configure The Public Key For SSH Access
-        if settings.include? 'authorize'
-            if File.exist? File.expand_path(settings['authorize'])
-                config.vm.provision 'shell' do |s|
-                    s.inline = "echo $1 | grep -xq \"$1\" /home/vagrant/.ssh/authorized_keys || echo \"\n$1\" | tee -a /home/vagrant/.ssh/authorized_keys"
-                    s.args = [File.read(File.expand_path(settings['authorize']))]
-                end
-            end
-        end
+        # if settings.include? 'authorize'
+        #     if File.exist? File.expand_path(settings['authorize'])
+        #         config.vm.provision 'shell' do |s|
+        #             s.inline = "echo $1 | grep -xq \"$1\" /home/vagrant/.ssh/authorized_keys || echo \"\n$1\" | tee -a /home/vagrant/.ssh/authorized_keys"
+        #             s.args = [File.read(File.expand_path(settings['authorize']))]
+        #         end
+        #     end
+        # end
 
         # Copy The SSH Private Keys To The Box
         if settings.include? 'keys'
@@ -109,6 +112,7 @@ class Config
 
 
         # 共享文件夹
+        config.vm.synced_folder ".", "/vagrant", disabled:true
         if settings.include? 'folders'
             settings['folders'].each do |folder|
                 if File.exist? File.expand_path(folder['map'])

@@ -3,7 +3,6 @@
     "memory": 2048,
     "cpus": 2,
     "provider": "virtualbox",
-    // "authorize": "~/.ssh/vagrant/id_rsa.pub",
     // "keys": [
     //     "~/.ssh/ljnewmap/id_rsa"
     // ],
