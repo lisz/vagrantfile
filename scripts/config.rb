@@ -12,7 +12,7 @@ class Config
         # 设置虚拟机配置 name 是和虚拟机的关联属性
         config.vm.define settings['name'] ||= 'lis-centos'
         config.vm.box = settings['box'] ||= 'lis/centos'
-        config.vm.box_version = settings['version'] || '>=0.0.1'
+        config.vm.box_version = settings['version'] ||= '>=0.0.1'
         config.vm.hostname = settings['hostname'] ||= 'lis'
 
         config.vm.provider 'virtualbox' do |box|
