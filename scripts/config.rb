@@ -13,7 +13,7 @@ class Config
         config.vm.define settings['name'] ||= 'lis-centos'
         config.vm.box = settings['box'] ||= 'lis/centos'
         config.vm.box_version = settings['version'] || '>=0.0.1'
-        config.vm.hostname = 'lis'
+        config.vm.hostname = settings['hostname'] ||= 'lis'
 
         config.vm.provider 'virtualbox' do |box|
             box.name = settings['name'] ||= 'lis-centos'

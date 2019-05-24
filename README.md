@@ -42,3 +42,17 @@
 - `mv .ssh/id_rsa /var/www/`复制到本机映射目录
 - 配置`config.json`中`private_key_path`，对应`id_rsa`文件位置
 - `vagrant reload --privision`
+
+
+
+---
+
+#### 预装应用
+
+- `PHP 7.3.5`
+- `nginx 1.16.0`
+- `git 2.22.0`
+- `node 10.15.3`
+- `npm 6.4.1`
+- `composer v.8.5`
+- `redis`
