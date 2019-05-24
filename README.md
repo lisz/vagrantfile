@@ -32,3 +32,13 @@
 
 
 
+---
+
+##### 配置证书登录
+
+- `vagrant ssh`登录到虚拟机(登录密码`vagrant`)
+- 生成私钥和公钥`ssh-keygen -t rsa`提示框全部确认
+- `cat .ssh/id_rsa.pub .ssh/authorized_keys`
+- `mv .ssh/id_rsa /var/www/`复制到本机映射目录
+- 配置`config.json`中`private_key_path`，对应`id_rsa`文件位置
+- `vagrant reload --privision`

@@ -9,12 +9,6 @@ class Config
 
         script_dir = File.dirname(__FILE__)
 
-        # 运行ssh代理转发
-        config.ssh.insert_key = false
-        config.ssh.forward_agent = true
-        config.ssh.username = settings['username'] ||= 'vagrant'
-        config.ssh.password = settings['password'] ||= 'vagrant'
-
         # 设置虚拟机配置 name 是和虚拟机的关联属性
         config.vm.define settings['name'] ||= 'lis-centos'
         config.vm.box = settings['box'] ||= 'lis/centos'
@@ -80,17 +74,36 @@ class Config
             end
         end
 
-        # Configure The Public Key For SSH Access
+
+        # 运行ssh代理转发
+        config.ssh.forward_agent = true
+
+        # 配置证书登录
         # if settings.include? 'authorize'
         #     if File.exist? File.expand_path(settings['authorize'])
         #         config.vm.provision 'shell' do |s|
         #             s.inline = "echo $1 | grep -xq \"$1\" /home/vagrant/.ssh/authorized_keys || echo \"\n$1\" | tee -a /home/vagrant/.ssh/authorized_keys"
         #             s.args = [File.read(File.expand_path(settings['authorize']))]
         #         end
+        #         pubFile = settings['authorize']
+        #         config.ssh.private_key_path = pubFile[0, pubFile.rindex('.')]
         #     end
+        # else
+        #     config.ssh.insert_key = false
+        #     config.ssh.username = settings['username'] ||= 'vagrant'
+        #     config.ssh.password = settings['password'] ||= 'vagrant'
         # end
+        if settings.include? 'private_key_path'
+            if File.exist? File.expand_path(settings['private_key_path'])
+                config.ssh.private_key_path = settings['private_key_path']
+            end
+        else
+            config.ssh.insert_key = false
+            config.ssh.username = settings['username'] ||= 'vagrant'
+            config.ssh.password = settings['password'] ||= 'vagrant'
+        end
 
-        # Copy The SSH Private Keys To The Box
+        # 复制ssh私钥(Git访问ssh仓库)
         if settings.include? 'keys'
             if settings['keys'].to_s.length.zero?
                 puts 'Check your Homestead.yaml file, you have no private key(s) specified.'

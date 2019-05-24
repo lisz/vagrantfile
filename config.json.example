@@ -3,6 +3,7 @@
     "memory": 2048,
     "cpus": 2,
     "provider": "virtualbox",
+    // "private_key_path": "~/.ssh/vagrant/id_rsa",
     // "keys": [
     //     "~/.ssh/ljnewmap/id_rsa"
     // ],
