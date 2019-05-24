@@ -106,7 +106,7 @@ class Config
         # 复制ssh私钥(Git访问ssh仓库)
         if settings.include? 'keys'
             if settings['keys'].to_s.length.zero?
-                puts 'Check your Homestead.yaml file, you have no private key(s) specified.'
+                puts 'Check your config.json file, you have no private key(s) specified.'
                 exit
             end
             settings['keys'].each do |key|
@@ -117,7 +117,7 @@ class Config
                         s.args = [File.read(File.expand_path(key)), key.split('/').last]
                     end
                 else
-                    puts 'Check your Homestead.yaml (or Homestead.json) file, the path to your private key does not exist.'
+                    puts 'Check your config.json file, the path to your private key does not exist.'
                     exit
                 end
             end
