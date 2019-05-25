@@ -2,21 +2,16 @@
     "ip": "192.168.10.10",
     "memory": 2048,
     "cpus": 2,
-    "provider": "virtualbox",
-    // "private_key_path": "~/.ssh/vagrant/id_rsa",
-    // "keys": [
-    //     "~/.ssh/ljnewmap/id_rsa"
-    // ],
     "folders": [
         {
-            "map": "C:\\www\\hiking",
+            "map": "C:\\www",
             "to": "/var/www"
         }
     ],
     "sites": [
         {
-            "map": "hiking.box",
-            "to": "/var/www/api/public"
+            "map": "test.box",
+            "to": "/var/www/public"
         }
     ]
 }

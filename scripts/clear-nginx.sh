@@ -2,4 +2,4 @@
 
 # 清理nginx配置目录
 
-rm -f /etc/nginx/webroot/*
+rm -f /etc/nginx/conf/webroot/*

@@ -12,7 +12,7 @@ class Config
         # 设置虚拟机配置 name 是和虚拟机的关联属性
         config.vm.define settings['name'] ||= 'lis-centos'
         config.vm.box = settings['box'] ||= 'lis/centos'
-        config.vm.box_version = settings['version'] ||= '>=0.0.1'
+        config.vm.box_version = settings['version'] ||= '0'
         config.vm.hostname = settings['hostname'] ||= 'lis'
 
         config.vm.provider 'virtualbox' do |box|
@@ -22,14 +22,8 @@ class Config
             box.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
             box.customize ['modifyvm', :id, '--natdnshostresolver1', settings['natdnshostresolver'] ||= 'on']
             box.customize ['modifyvm', :id, '--ostype', 'RedHat_64']
-            if settings.has_key?('gui') && settings['gui']
-                box.gui = true
-            end
         end
 
-        if Vagrant.has_plugin?("vagrant-vbguest")
-            config.vbguest.auto_update = false
-        end
 
         # 设置ip
         if settings['ip'] != 'autonetwork'
@@ -38,94 +32,8 @@ class Config
             config.vm.network :private_network, ip: '0.0.0.0', auto_network: true
         end
 
-        # 端口
-        if settings.has_key?('ports')
-            settings['ports'].each do |port|
-                port['guest'] ||= port['to']
-                port['host'] ||= port['send']
-                port['protocol'] ||= 'tcp'
-            end
-        else
-            settings['ports'] = []
-        end
-
-        # Default Port Forwarding
-        default_ports = {
-            80 => 8000,
-            443 => 44300,
-            3306 => 33060,
-            6379 => 63790,
-            5432 => 54320
-        }
-
-        # Use Default Port Forwarding Unless Overridden
-        unless settings.has_key?('default_ports') && settings['default_ports'] == false
-            default_ports.each do |guest, host|
-                unless settings['ports'].any? { |mapping| mapping['guest'] == guest }
-                    config.vm.network 'forwarded_port', guest: guest, host: host, auto_correct: true
-                end
-            end
-        end
-
-        # Add Custom Ports From Configuration
-        if settings.has_key?('ports')
-            settings['ports'].each do |port|
-                config.vm.network 'forwarded_port', guest: port['guest'], host: port['host'], protocol: port['protocol'], auto_correct: true
-            end
-        end
-
-
-        # 运行ssh代理转发
-        config.ssh.forward_agent = true
-
-        # 配置证书登录
-        # if settings.include? 'authorize'
-        #     if File.exist? File.expand_path(settings['authorize'])
-        #         config.vm.provision 'shell' do |s|
-        #             s.inline = "echo $1 | grep -xq \"$1\" /home/vagrant/.ssh/authorized_keys || echo \"\n$1\" | tee -a /home/vagrant/.ssh/authorized_keys"
-        #             s.args = [File.read(File.expand_path(settings['authorize']))]
-        #         end
-        #         pubFile = settings['authorize']
-        #         config.ssh.private_key_path = pubFile[0, pubFile.rindex('.')]
-        #     end
-        # else
-        #     config.ssh.insert_key = false
-        #     config.ssh.username = settings['username'] ||= 'vagrant'
-        #     config.ssh.password = settings['password'] ||= 'vagrant'
-        # end
-        if settings.include? 'private_key_path'
-            if File.exist? File.expand_path(settings['private_key_path'])
-                config.ssh.private_key_path = settings['private_key_path']
-            end
-        else
-            config.ssh.insert_key = false
-            config.ssh.username = settings['username'] ||= 'vagrant'
-            config.ssh.password = settings['password'] ||= 'vagrant'
-        end
-
-        # 复制ssh私钥(Git访问ssh仓库)
-        if settings.include? 'keys'
-            if settings['keys'].to_s.length.zero?
-                puts 'Check your config.json file, you have no private key(s) specified.'
-                exit
-            end
-            settings['keys'].each do |key|
-                if File.exist? File.expand_path(key)
-                    config.vm.provision 'shell' do |s|
-                        s.privileged = false
-                        s.inline = "echo \"$1\" > /home/vagrant/.ssh/$2 && chmod 600 /home/vagrant/.ssh/$2"
-                        s.args = [File.read(File.expand_path(key)), key.split('/').last]
-                    end
-                else
-                    puts 'Check your config.json file, the path to your private key does not exist.'
-                    exit
-                end
-            end
-        end
-
-
         # 共享文件夹
-        config.vm.synced_folder ".", "/vagrant", disabled:true
+        # config.vm.synced_folder ".", "/vagrant", disabled:true
         if settings.include? 'folders'
             settings['folders'].each do |folder|
                 if File.exist? File.expand_path(folder['map'])
@@ -163,6 +71,41 @@ class Config
             end
         end
 
+        # 端口
+        if settings.has_key?('ports')
+            settings['ports'].each do |port|
+                port['guest'] ||= port['to']
+                port['host'] ||= port['send']
+                port['protocol'] ||= 'tcp'
+            end
+        else
+            settings['ports'] = []
+        end
+
+        # Default Port Forwarding
+        default_ports = {
+            80 => 8000,
+            443 => 44300,
+            3306 => 33060,
+            6379 => 63790,
+            5432 => 54320
+        }
+
+        unless settings.has_key?('default_ports') && settings['default_ports'] == false
+            default_ports.each do |guest, host|
+                unless settings['ports'].any? { |mapping| mapping['guest'] == guest }
+                    config.vm.network 'forwarded_port', guest: guest, host: host, auto_correct: true
+                end
+            end
+        end
+
+        if settings.has_key?('ports')
+            settings['ports'].each do |port|
+                config.vm.network 'forwarded_port', guest: port['guest'], host: port['host'], protocol: port['protocol'], auto_correct: true
+            end
+        end
+
+
         # 配置域名网站
         config.vm.provision 'shell' do |s|
           s.path = script_dir + '/clear-nginx.sh'
@@ -174,44 +117,19 @@ class Config
 
         if settings.include? 'sites'
             settings['sites'].each do |site|
-                # config.vm.provision 'shell' do |s|
-                #     s.name = 'Creating Certificate: ' + site['map']
-                #     s.path = script_dir + '/create-certificate.sh'
-                #     s.args = [site['map']]
-                # end
-
                 type = site['type'] ||= 'laravel'
                 http_port = '80'
-                https_port = '443'
 
                 config.vm.provision 'shell' do |s|
                     s.name = 'Creating site: ' + site['map']
-                    if site.include? 'params'
-                        params = '('
-                            site['params'].each do |param|
-                                params += ' [' + param['key'] + ']=' + param['value']
-                            end
-                        params += ' )'
-                    end
-                    if site.include? 'headers'
-                        headers = '('
-                            site['headers'].each do |header|
-                                headers += ' [' + header['key'] + ']=' + header['value']
-                            end
-                        headers += ' )'
-                    end
-                    if site.include? 'rewrites'
-                        rewrites = '('
-                            site['rewrites'].each do |rewrite|
-                                rewrites += ' [' + rewrite['map'] + ']=' + "'" + rewrite['to'] + "'"
-                            end
-                        rewrites += ' )'
-                        # Escape variables for bash
-                        rewrites.gsub! '$', '\$'
-                    end
-
                     s.path = script_dir + "/serve-#{type}.sh"
-                    s.args = [site['map'], site['to'], site['port'] ||= http_port, site['ssl'] ||= https_port, site['php'] ||= '7.3', params ||= '', site['xhgui'] ||= '', site['exec'] ||= 'false', headers ||= '', rewrites ||= '']
+                    s.args = [site['map'], site['to'], site['port'] ||= http_port]
+                end
+
+                config.vm.provision 'shell' do |s|
+                   s.name = 'Setting hosts'
+                   s.path = script_dir + '/hosts-add.sh'
+                   s.args = ['127.0.0.1', site['map']]
                 end
 
                 # 定时任务
@@ -240,9 +158,10 @@ class Config
 
         # 重启服务
         config.vm.provision 'shell' do |s|
-            s.name = 'Restarting Nginx'
+            s.name = 'Restarting Nginx php-fpm'
             s.inline = 'sudo systemctl reload nginx; sudo systemctl restart php-fpm;'
         end
+
 
     end
 end

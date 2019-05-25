@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Add new IP-host pair to /etc/hosts.
-
 if [[ "$1" && "$2" ]]
 then
     IP=$1
