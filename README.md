@@ -21,7 +21,7 @@
 - `vagrant box add lis/centos`
 
 ##### --> 离线安装
-- 将`lis-centos.box`文件复制到当前目录 [下载链接][1]
+- 将`lis-centos.box`文件复制到当前目录([镜像市场][1]，[百度网盘][2] 提取码：ghf0)
 - `vagrant box add lis/centos lis-centos.box`
 
 ---
@@ -44,3 +44,4 @@
 - `redis-cli 3.2.12`
 
 [1]: https://vagrantcloud.com/lis/boxes/centos/versions/0.0.2/providers/virtualbox.box
+[2]: https://pan.baidu.com/s/1s8V3awpUAXHIBFRs8Fe3rg

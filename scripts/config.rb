@@ -33,7 +33,7 @@ class Config
         end
 
         # 共享文件夹
-        # config.vm.synced_folder ".", "/vagrant", disabled:true
+        config.vm.synced_folder ".", "/vagrant", disabled:true
         if settings.include? 'folders'
             settings['folders'].each do |folder|
                 if File.exist? File.expand_path(folder['map'])
