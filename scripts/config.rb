@@ -26,14 +26,17 @@ class Config
 
 
         # 设置ip
+        ip = '0.0.0.0'
         if settings['ip'] != 'autonetwork'
-            config.vm.network :private_network, ip: settings['ip'] ||= '192.168.10.10'
+            ip = settings['ip'] ||= '192.168.10.10'
+            config.vm.network :private_network, ip: ip
         else
-            config.vm.network :private_network, ip: '0.0.0.0', auto_network: true
+            ip = '0.0.0.0'
+            config.vm.network :private_network, ip: ip, auto_network: true
         end
 
         # 共享文件夹
-        config.vm.synced_folder ".", "/vagrant", disabled:true
+        config.vm.synced_folder ".", "/vagrant", disabled: true
         if settings.include? 'folders'
             settings['folders'].each do |folder|
                 if File.exist? File.expand_path(folder['map'])
@@ -156,12 +159,28 @@ class Config
             end
         end
 
+
+        # 备份数据库
+        if settings.has_key?('backup') && settings['backup']
+          dir = settings['backup_dir'] ||= "/var/www/backup"
+          settings['databases'].each do |database|
+            Config.backup_postgres(database, dir, config)
+          end
+        end
+
         # 重启服务
         config.vm.provision 'shell' do |s|
             s.name = 'Restarting Nginx php-fpm'
             s.inline = 'sudo systemctl reload nginx; sudo systemctl restart php-fpm;'
         end
 
+    end
 
+    def self.backup_postgres(database, dir, config)
+      now = Time.now.strftime("%Y%m%d%H%M")
+      config.trigger.after :provision do |trigger|
+        trigger.warn = "Backing up postgres database #{database}..."
+        trigger.run_remote = { inline: "mkdir -p #{dir} && pg_dump -U postgres -f #{dir}/#{database}-#{now}.sql #{database}" }
+      end
     end
 end

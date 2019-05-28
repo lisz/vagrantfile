@@ -13,5 +13,10 @@
             "map": "test.box",
             "to": "/var/www/public"
         }
+    ],
+    "backup": true,
+    "backup_dir": "/var/www/backup",
+    "databases": [
+        "test"
     ]
 }
