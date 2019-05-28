@@ -178,7 +178,7 @@ class Config
 
     def self.backup_postgres(database, dir, config)
       now = Time.now.strftime("%Y%m%d%H%M")
-      config.trigger.after :provision do |trigger|
+      config.trigger.before [:provision, :destroy, :halt] do |trigger|
         trigger.warn = "Backing up postgres database #{database}..."
         trigger.run_remote = { inline: "mkdir -p #{dir} && pg_dump -U postgres -f #{dir}/#{database}-#{now}.sql #{database}" }
       end
